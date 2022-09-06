@@ -1,26 +1,25 @@
-import { Channel } from 'stream-chat'
 import {Avatar,useChatContext,} from 'stream-chat-react'
 
-const TeamChannelPreview = ({channel, type}) => {
-    const {channel:activeChannel, client}=useChatContext
-
-    const ChannelPreview=()=>{
-        <p className='channel-preview__item'>
-            #{channel?.data?.name || channel?.data?.id}
+const TeamChannelPreview = ({channel, type, setToggleContainer, setIsCreating, setIsEditing, setActiveChannel}) => {
+    const {channel:activeChannel, client}=useChatContext()
+    
+    const ChannelPreview=()=>(
+        <p className="channel-preview__item">
+            # {channel?.data?.name || channel?.data?.id}
         </p>
-    }
+    )
 
     const DirectPreview=()=>{
         const members= Object.values(channel.state.members).filter(({user})=>user.id!==client.userId)
-        
+        console.log(members[0])
         return(
             <div className='channel-preview__item single'>
                 <Avatar
                     image={members[0]?.user?.image}
-                    name={members[0]?.user?.fullname}
+                    name={members[0]?.user?.fullname  }
                     size={24}
                 />
-                <p>{members[0]?.user?.fullname}</p>
+                <p>{members[0]?.user?.fullname || members[0]?.user?.name || members[0]?.user?.id }</p>
             </div>
         )
     }
@@ -29,11 +28,18 @@ const TeamChannelPreview = ({channel, type}) => {
         <div className={
             channel?.id===activeChannel?.id?
                 'channel-preview__wrapper__selected':
-                'channel-previewpreview__wrapper'
+                'channel-preview__wrapper'
         }
-        onClick={()=>console.log(channel)}>
+        onClick={()=>{
+            setIsCreating(false)
+            setIsEditing(false)
+            setActiveChannel(channel)
+            if(setToggleContainer){
+                setToggleContainer(prevState=>!prevState)
+            }
+        }}>
             
-            {type==='team'? <ChannelPreview/>:<DirectPreview/>}    
+            {type === 'team' ? <ChannelPreview /> : <DirectPreview />}    
         </div>
     )
 }
